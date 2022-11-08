@@ -47,12 +47,12 @@ services:
     # volumes:
     #   - ./default.json:/usr/share/nginx/html/config/default.json
 
-  mpi-emr-mediator:
-    container_name: mpi_emr_mediator
-    build:
-      ./
+  emr-mpi-mediator:
+    container_name: emr-mpi-mediator
     ports:
       - "127.0.0.1:7000:7000"
+    build:
+     ./
     restart: unless-stopped
 
 volumes:
