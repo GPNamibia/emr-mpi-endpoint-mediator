@@ -1,0 +1,30 @@
+{
+    "urn": "urn:mediator:emr-mpi-mediator",
+    "version": "1.0.0",
+    "name": "EMR Endpoint Mediator",
+    "description": "This mediator is intended sending request to sante mpi mediator",
+    "defaultChannelConfig": [{
+        "name": "EMR Endpoint Mediator",
+        "urlPattern": "^/emr-mpi-mediator$",
+        "routes": [{
+            "name": "EMR Endpoint Mediator Route",
+            "host": "emr-mpi-mediator",
+            "path": "/",
+            "port": "7000",
+            "primary": true,
+            "type": "http"
+        }],
+        "allow": ["admin"],
+        "methods": ["GET", "PATCH","POST","PUT"],
+        "type": "http"
+    }],
+    "endpoints": [{
+        "name": "EMR Endpoint Mediator Endpoint",
+        "host": "emr-mpi-mediator",
+        "path": "/",
+        "port": "7000",
+        "primary": false,
+        "type": "http"
+    }],
+    "configDefs": []
+}
