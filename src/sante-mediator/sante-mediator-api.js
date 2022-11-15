@@ -1,6 +1,7 @@
 const axios = require('axios');
-const config = require('../config/private-config.json')
+const config = require('../config/private-config.json');
 const instance = axios.create({ baseURL: config.santeMpiMediatorConfig.apiURL });
+const openHimInstance = axios.create({ baseURL: config.santeMpiMediatorConfig.santApiURL });
 
 class SanteAPI {
 
@@ -13,6 +14,7 @@ class SanteAPI {
                 Authorization: `${accessToken}`
             },
         });
+        openHimInstance.get(config.santeMpiMediatorConfig.santApiURL, {});
         return response.data;
     }
 
@@ -24,6 +26,21 @@ class SanteAPI {
                 Authorization: `${accessToken}`
             },
         });
+        openHimInstance.post(config.santeMpiMediatorConfig.santApiURL, {});
+        return response.data;
+    }
+
+    async authPost(username,password,client_id,client_secret,grant_type){
+        const response = await instance.post(config.santeMpiMediatorConfig.apiURL+'/userAuth' , {
+            headers:{
+                username: username,
+                password: password,
+                client_id:client_id,
+                client_secret:client_secret,
+                grant_type:grant_type
+            }
+        });
+        openHimInstance.post(config.santeMpiMediatorConfig.santApiURL, {});
         return response.data;
     }
 
@@ -35,6 +52,7 @@ class SanteAPI {
                 Authorization: `${accessToken}` 
             },
         });
+        openHimInstance.put(config.santeMpiMediatorConfig.santApiURL, {});
         return response.data;
     }
 
@@ -47,6 +65,7 @@ class SanteAPI {
             'Content-Type': 'application/json'
           },
         }); 
+        openHimInstance.post(config.santeMpiMediatorConfig.santApiURL, {});
         return response.data;
     }
 
@@ -58,6 +77,7 @@ class SanteAPI {
             Authorization: `${accessToken}` 
         },
         });
+        openHimInstance.get(config.santeMpiMediatorConfig.santApiURL, {});
         return response.data;
     }
 }
