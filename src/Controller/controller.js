@@ -186,6 +186,22 @@ const mergePatient = async (req,res) => {
     })    
 };
 
+const getToken = async(req,res) => {
+  //Extracting user auth headers
+  const username = req.headers.username;
+  const password = req.headers.password;
+  const client_id = req.headers.client_id;
+  const client_secret = req.headers.client_secret;
+  const grant_type = req.headers.grant_type;
+  //sending request
+  santeAPI.authPost(username,password,client_id,client_secret,grant_type).then(response => { 
+    res.status(200).send(response);
+    return response;
+  }).catch(error => {
+    res.status(400).send(error)
+  })
+};
+
 
 module.exports = {
     getOnePatient,
@@ -195,5 +211,6 @@ module.exports = {
     createPatient,
     updatePatient,
     mergePatient,
-    validatePatient
+    validatePatient,
+    getToken
 };
