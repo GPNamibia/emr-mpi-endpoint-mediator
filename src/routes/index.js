@@ -1,5 +1,4 @@
 const bodyParser = require('body-parser')
-
 const router = require('express').Router()
 
 // import controller
@@ -27,5 +26,7 @@ router.post('/merge', controller.mergePatient)
 router.get('/qr/:id', controller.generateQR)
 
 router.get('/validate/:id', controller.validatePatient)
+
+router.post('/auth', controller.getToken);
 
 module.exports = router;
