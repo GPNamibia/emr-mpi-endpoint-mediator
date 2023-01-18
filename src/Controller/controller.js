@@ -7,6 +7,9 @@ const santeAPI = new SanteAPI();
 const config = require('../config/private-config.json');
 
 const getOnePatient = async(req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -18,6 +21,9 @@ const getOnePatient = async(req,res) => {
 };
 
 const generateQR = async(req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -29,6 +35,9 @@ const generateQR = async(req,res) => {
 };
 
 const validatePatient = async(req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -40,6 +49,9 @@ const validatePatient = async(req,res) => {
 };
 
 const searchPatient =  async (req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let url = '/getResource'+req._parsedUrl.search;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -52,6 +64,8 @@ const searchPatient =  async (req,res) => {
 };
 
 const getSimilarPatient =  async (req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
 
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
@@ -69,6 +83,9 @@ const getSimilarPatient =  async (req,res) => {
 };
 
 const createPatient = async (req,res) =>  {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let body = req.body; 
     let accessToken = req.headers.authorization;
     santeAPI.POST(body,accessToken).then(response => {
@@ -81,6 +98,9 @@ const createPatient = async (req,res) =>  {
 
 
 const updatePatient = async  (req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => {
@@ -97,6 +117,9 @@ const updatePatient = async  (req,res) => {
 };
 
 const mergePatient = async (req,res) => {
+    //set content type to fhir
+    res.setHeader('Content-Type', 'application/fhir+json');
+
     let fromURL = '/getResource?identifier=http://ohie.org/Health_ID|'+req.body.from;
     let intoURL = '/getResource?identifier=http://ohie.org/Health_ID|'+req.body.into;
     let santeURL = "https://santempi-console.globalhealthapp.net/#!/";
@@ -187,6 +210,8 @@ const mergePatient = async (req,res) => {
 };
 
 const getToken = async(req,res) => {
+  //set content type to fhir
+  res.setHeader('Content-Type', 'application/fhir+json');
   //Extracting user auth headers
   const username = req.headers.username;
   const password = req.headers.password;
