@@ -7,9 +7,13 @@ const santeAPI = new SanteAPI();
 const config = require('../config/private-config.json');
 
 const getOnePatient = async(req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
-
+    //set url/token
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -21,9 +25,13 @@ const getOnePatient = async(req,res) => {
 };
 
 const generateQR = async(req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
-
+    //set url/token
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -35,9 +43,13 @@ const generateQR = async(req,res) => {
 };
 
 const validatePatient = async(req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
-
+    //set url/token
     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -49,9 +61,13 @@ const validatePatient = async(req,res) => {
 };
 
 const searchPatient =  async (req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
-
+    //set url/token
     let url = '/getResource'+req._parsedUrl.search;  
     let accessToken = req.headers.authorization;
     santeAPI.GET(accessToken,url).then(response => { 
@@ -64,6 +80,10 @@ const searchPatient =  async (req,res) => {
 };
 
 const getSimilarPatient =  async (req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
 
@@ -83,6 +103,10 @@ const getSimilarPatient =  async (req,res) => {
 };
 
 const createPatient = async (req,res) =>  {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
 
@@ -98,6 +122,10 @@ const createPatient = async (req,res) =>  {
 
 
 const updatePatient = async  (req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
 
@@ -117,6 +145,10 @@ const updatePatient = async  (req,res) => {
 };
 
 const mergePatient = async (req,res) => {
+  if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
     //set content type to fhir
     res.setHeader('Content-Type', 'application/fhir+json');
 
@@ -210,6 +242,10 @@ const mergePatient = async (req,res) => {
 };
 
 const getToken = async(req,res) => {
+   if (req.headers['content-type'] !== 'application/fhir+json') {
+    res.status(415).send({error: 'Unsupported Media Type'});
+    return;
+  }
   //set content type to fhir
   res.setHeader('Content-Type', 'application/fhir+json');
   //Extracting user auth headers

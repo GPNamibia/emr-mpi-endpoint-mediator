@@ -1,15 +1,26 @@
+
 # Endpoints
+
 ## Search Patient
 
+  
+
 URL: `localhost:7000/patient?freetext=Pete`
+
 Method: `GET`
+
 Authentication: `Required`
-localhost:`7000 The link to where the MPI mediator is hosted.`
-/patient :`The patient endpoint.`
-freetext=Pete : `Specifies the text used to perform search.`
 
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
 
-Response:
+Parameter: | _**/patient**_ | Specifies the patient endpoint |
+
+Parameter: | _**freetext**_ | Specifies the text used to perform search |
+
+  
+  
+**Response:** 
+
 
 
 ```json
@@ -171,17 +182,31 @@ Response:
 }
 ```
 
+  
+  
 
 ## Advanced search
 
-URL: `localhost:7000/patient?family=Peter&given=Ken`
-Method: `GET`
-Authentication: `Required`
-localhost:7000/ :`The link to where the MPI mediator is hosted.`
-/patient :`The patient endpoint.`
-family=Peter&given=Ken :`Defines the search parameters. In this case, the search is for a patient with Peter as the family name and Ken as the given name.`
+  
 
-Response:
+URL: `localhost:7000/patient?family=Peter&given=Ken`
+
+Method: `GET`
+
+Authentication: `Required`
+
+Parameters: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
+
+Parameters: | _**/patient**_ | Specifies the patient endpoint |
+
+Parameters: | _**family=Peter&given=Ken**_ | Defines the search parameters. In this case, the search is for a patient with Peter as the family name and Ken as the given name |
+
+  
+
+**Response:**
+
+  
+  
 
 
 ```json
@@ -239,16 +264,29 @@ Response:
 }
 ```
 
-
+  
+  
+  
 
 ## Register Patient
 
+  
+
 URL: `localhost:7000/patient`
+
 Method: `POST`
+
 Authentication: `Required`
 
-Request Body:
+Parameters: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
 
+Parameters: | _**/patient**_ | Specifies the patient endpoint |
+  
+
+**Request Body:**
+
+  
+  
 
 ```json
 POST localhost:7000/patient
@@ -276,10 +314,14 @@ POST localhost:7000/patient
 }
 ```
 
+  
+  
+  
 
+**Response:**
 
-Response:
-
+  
+  
 
 ```json
 {
@@ -329,15 +371,28 @@ Response:
     ]
 }
 ```
+  
 
 ## Update Patient
 
+  
+
 URL: `localhost:7000/patient/12WENR6`
+
 Method: `PUT`
+
 Authentication: `Required`
 
-Request Body:
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
 
+Parameter: | _**/patient**_ | Specifies the patient endpoint |
+
+  
+
+**Request Body:**
+
+  
+  
 
 ```json
 PUT localhost:7000/patient/12WENR6
@@ -369,10 +424,14 @@ PUT localhost:7000/patient/12WENR6
 }
 ```
 
+  
+  
+  
 
+**Response:**
 
-Response:
-
+  
+  
 
 ```json
 {
@@ -432,19 +491,31 @@ Response:
     ]
 }
 ```
+
+  
 
 ## Get one patient by Health ID
 
+  
+
 URL: `localhost:7000/Patient/12WENR6`
+
 Method: `GET`
+
 Authentication: `Required`
-localhost:`7000 The link to where the MPI mediator is hosted.`
-/patient :`The patient endpoint.`
-identifier_type=Health_ID&identifier_no=12WENR6 :`Specifies the health ID for patient one is `
+
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
+
+Parameter: | _**/patient**_ | Specifies the patient endpoint |
+
+Parameter: | _**/identifier_type=Health_ID&identifier_no=12WENR6**_ | Specifies the health ID for patient one is |
 
 
-Response:
 
+**Response:**
+
+  
+  
 
 ```json
 {
@@ -505,18 +576,31 @@ Response:
 }
 ```
 
+  
+  
 
 ## Similar Patient
 
+  
+
 URL: `localhost:7000/similar/12WENR6`
+
 Method: `GET`
+
 Authentication: `Required`
-localhost:7000/ `:The link to where the HDSI mediator is hosted`
-similar `:End point used to search  similar patients.`
-identifier_type=Health_ID&identifier_no=12WENR6 :`Specifies the health ID for patient for whom one is searching similar patients for.`
 
-Response:
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
 
+Parameter: | _**/similar**_ | End point used to search similar patients |
+
+Parameter: | _**/identifier_type=Health_ID&identifier_no=12WENR6**_ | Specifies the health ID for patient for whom one is searching similar patients for |
+
+  
+
+**Response:**
+
+  
+  
 
 ```xml
 <?xml version="1.0"?>
@@ -631,30 +715,54 @@ Response:
 </Bundle>
 ```
 
+  
+  
 
 ## Patient Merging
 
+  
+
 URL: `localhost:7000/merge`
+
 Method: `POST`
+
 Authentication: `Required`
-Content-Type:application/fhir+json `:Defines the format for the data on the request body`
-localhost:7000/ `:The link to where the MPI mediator is hosted`
-merge `:End point used to link patients.`
 
-Request Body:
+Header : | _**Content-Type : application/fhir+json**_ | Defines the format for the data on the request body |
 
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
+
+Parameter: | _**merge**_ | End point used to link patients|
+
+
+**Request Body:**
+
+  
+  
 
 ```json
+
 POST localhost:7000/merge
+
 {
-    "from": "12WENR6",
-    "into": "12WENR7"
+
+"from": "12WENR6",
+
+"into": "12WENR7"
+
 }
+
 ```
 
+  
+  
+  
 
+**Response:**
 
-Response:
+  
+  
+
 
 
 ```json
@@ -696,16 +804,29 @@ Response:
 }
 ```
 
+  
+
 ## Generate QR Code
 
-URL: `localhost:7000/QR/12WENR6`
-Method: `GET`
-Authentication: `Required`
-localhost:7000/ `:The link to where the MPI mediator is hosted`
-QR `:End point used to generate the patient’s QR code.`
-identifier_type=Health_ID&identifier_no=12WENR6 `:Defines the search parameter. In this case, the search is for a patient with 12WENR6 as the health ID.`
+  
 
-Response:
+URL: `localhost:7000/QR/12WENR6`
+
+Method: `GET`
+
+Authentication: `Required`
+
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
+
+Parameter: | _**QR**_ | End point used to generate the patient’s QR code |
+
+Parameter: | _**identifier_type=Health_ID&identifier_no=12WENR6**_ | Defines the search parameter. In this case, the search is for a patient with 12WENR6 as the health ID |
+
+
+**Response:**
+
+  
+  
 
 
 ```json
@@ -774,19 +895,31 @@ Response:
     ]
 }
 ```
-
-
+  
+  
+  
 
 ## Validate patient details with Home Affairs and MPI
 
-URL: `localhost:7000/validate/12WENR6`
-Method: `GET`
-Authentication: `Required`
-localhost:7000/ `:The link to where the MPI mediator is hosted`
-validate `:End point used to validate a patient resource with home afairs and MPI.`
-identifier_type=Health_ID&identifier_no=12WENR6 `:Defines the search parameter. In this case, the search is for a patient with 12WENR6 as the Health ID.`
-Response:
+  
 
+URL: `localhost:7000/validate/12WENR6`
+
+Method: `GET`
+
+Authentication: `Required`
+
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
+
+Parameter: | _**validate**_ | End point used to validate a patient resource with home afairs and MPI |
+
+Parameter: | _**identifier_type=Health_ID&identifier_no=12WENR6**_ | Defines the search parameter. In this case, the search is for a patient with 12WENR6 as the Health ID |
+
+
+**Response:**
+
+  
+  
 
 ```json
 {
@@ -856,16 +989,28 @@ Response:
 ```
 
 
-
+  
 
 ## Authentication
+
 ## User authentication
 
-URL: `localhost:7000/auth`
-Method: `POST`
-Authentication: `Required`
-Request Body:
+  
 
+URL: `localhost:7000/auth`
+
+Method: `POST`
+
+Authentication: `Required`
+
+Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
+
+Parameter: | _**localhost:7000**_ | End point used to issue a Bearer token from santeMPI  |
+
+**Request Body:**
+
+  
+  
 
 ```json
 {
@@ -878,17 +1023,19 @@ Request Body:
 ```
 
 
+**Response:**
 
-Response:
+  
+  
 
 
 ```json
 {
     "access_token": "8C108588B30DED119ED50242AC160004E7F7FB80F5FCBE7A7D6A7FBFB53BC60B9E2DB0C7B063FBFA63DA17BFAB7526BF",
     
-    "id_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsIm5hbWUiOiI4MmY0MGE4OC05MDlmLTExZWMtYTNmNy0wMjQyYWMxNjAwMDIifQ.
+    "id_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsIm5hbWUiOiI4MmY0MGE4OC05MDlmLTExZWMtYTNmNy0wMjQyYWMxNjAwMDIifQ
     eyJ1bmlxdWVfbmFtZSI6ImpvaG4iLCJyb2xlIjoiUEVSU09OIiwiYXV0aG1ldGhvZCI6IlBhc3N3b3JkIiwibmFtZWlkIjoiNjQ2YTI5MDYtYmExZ
-    C0xMWVjLWE3MzQtMDI0MmFjMTYwMDA0IiwiYWN0b3J0IjoiMzM5MzJiNDItNmY0Yi00NjU5LTg4NDktNmFjYTU0MTM5ZDhlIiwiYXBwaWQiOiI4MmY
+    C0xMWVjLWE3MzQtMDI0MmFjMTYwMDA0IiwiYWN0b3J0IjoiMzM5MzJiNDItNmY0Yi00NjU5LTg4NDktNmFjYTU0MTM5ZDhlIiwiYXBwaWQiOiI4MmY"
     
     "token_type": "bearer",
     
@@ -897,4 +1044,3 @@ Response:
     "refresh_token": "CC4854779AD0764C8802003DB15CE8E27418039113F83087924C1DF66E71AB271D704ACE68674240881ADA8D11B02BF8"
 }
 ```
-

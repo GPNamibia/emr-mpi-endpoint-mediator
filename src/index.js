@@ -2,9 +2,12 @@ const express = require("express");
 const router = require("./routes");
 const privateConfig = require("./config/private-config.json");
 const { getQueryParameters } = require('./openHIM/initialize.js');
+const bodyParser = require('body-parser');
 
 const app = express();
 app.use(express.json());
+// parse the request body as JSON
+app.use(bodyParser.json({ type: 'application/fhir+json' }));
 
 app.all('*', router, (req, res) => {
     try {
