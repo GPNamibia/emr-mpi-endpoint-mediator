@@ -6,10 +6,14 @@
   
 
 URL: `localhost:7000/patient?freetext=Pete`
+=======
+URL: `http://localhost:7000/patient?freetext=Pete`
+
 
 Method: `GET`
 
 Authentication: `Required`
+
 
 Parameter: | _**localhost:7000**_ | Specifies the link to where the MPI mediator is hosted |
 
@@ -20,6 +24,12 @@ Parameter: | _**freetext**_ | Specifies the text used to perform search |
   
   
 **Response:** 
+=======
+Endpoint: `/patient`
+
+Parameters: 
+| ***freetext*** | Specifies the text used to perform search |
+ ___
 
 
 
