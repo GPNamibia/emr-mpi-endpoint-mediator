@@ -1,18 +1,14 @@
+
 # Endpoints
 ## Search Patient
 
-URL: `localhost:7000/patient?freetext=Pete`
-
+URL: `http://localhost:7000/patient?freetext=Pete`
 Method: `GET`
-
 Authentication: `Required`
-
-localhost:`7000 The link to where the MPI mediator is hosted.`
-
-/patient :`The patient endpoint.`
-
-freetext=Pete : `Specifies the text used to perform search.`
-
+Endpoint: `/patient`
+Parameters: 
+| ***freetext*** | Specifies the text used to perform search |
+ ___
 
 Response:
 
