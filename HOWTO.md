@@ -894,7 +894,7 @@ Parameter: | _**identifier_type=Health_ID&identifier_no=12WENR6**_ | Defines the
         }
     ]
 }
-
+```
   
   
   
@@ -988,9 +988,7 @@ Parameter: | _**identifier_type=Health_ID&identifier_no=12WENR6**_ | Defines the
 }
 ```
 
-  
-  
-  
+
   
 
 ## Authentication
@@ -1015,9 +1013,6 @@ Parameter: | _**localhost:7000**_ | End point used to issue a Bearer token from 
   
 
 ```json
-
-
-```json
 {
     "grant_type":"password"
     "client_id":"wick"
@@ -1038,7 +1033,7 @@ Parameter: | _**localhost:7000**_ | End point used to issue a Bearer token from 
 {
     "access_token": "8C108588B30DED119ED50242AC160004E7F7FB80F5FCBE7A7D6A7FBFB53BC60B9E2DB0C7B063FBFA63DA17BFAB7526BF",
     
-    "id_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsIm5hbWUiOiI4MmY0MGE4OC05MDlmLTExZWMtYTNmNy0wMjQyYWMxNjAwMDIifQ.
+    "id_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsIm5hbWUiOiI4MmY0MGE4OC05MDlmLTExZWMtYTNmNy0wMjQyYWMxNjAwMDIifQ
     eyJ1bmlxdWVfbmFtZSI6ImpvaG4iLCJyb2xlIjoiUEVSU09OIiwiYXV0aG1ldGhvZCI6IlBhc3N3b3JkIiwibmFtZWlkIjoiNjQ2YTI5MDYtYmExZ
     C0xMWVjLWE3MzQtMDI0MmFjMTYwMDA0IiwiYWN0b3J0IjoiMzM5MzJiNDItNmY0Yi00NjU5LTg4NDktNmFjYTU0MTM5ZDhlIiwiYXBwaWQiOiI4MmY"
     
