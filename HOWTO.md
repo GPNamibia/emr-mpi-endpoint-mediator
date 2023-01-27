@@ -3,9 +3,13 @@
 ## Search Patient
 
 URL: `http://localhost:7000/patient?freetext=Pete`
+
 Method: `GET`
+
 Authentication: `Required`
+
 Endpoint: `/patient`
+
 Parameters: 
 | ***freetext*** | Specifies the text used to perform search |
  ___
