@@ -6,9 +6,6 @@
   
 
 URL: `localhost:7000/patient?freetext=Pete`
-=======
-URL: `http://localhost:7000/patient?freetext=Pete`
-
 
 Method: `GET`
 
