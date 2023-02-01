@@ -23,6 +23,7 @@ class SanteAPI {
         const response = await instance.post(config.santeMpiMediatorConfig.apiURL+'/postResource' , newFhirPatient, {
             headers: 
             {
+                'Content-Type': 'application/json',
                 Authorization: `${accessToken}`
             },
         });
