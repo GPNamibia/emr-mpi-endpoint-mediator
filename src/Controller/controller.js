@@ -1,10 +1,60 @@
 const express = require("express");
+const _ = require('lodash');
+const http = require('http');
 
 const fetch = require('node-fetch');
 const { SanteAPI } = require('../sante-mediator/sante-mediator-api');
+const { NPRSAPI } = require('../nprs-mediator/nprs-mediator-api');
 const santeAPI = new SanteAPI();
+const nprsAPI = new NPRSAPI();
 
 const config = require('../config/private-config.json');
+
+
+function generateNPRSResource(body) {
+  return {
+    "resourceType": "Patient",
+    "identifier": [
+      {
+        "system": "http://example.com/idNo",
+        "value": body.identifier[0].value
+      }
+    ],
+    "gender": body.gender,
+    "name": [
+      {
+        "family": body.name[0].family,
+        "use": "official"
+      }
+    ],
+
+    "meta": {
+      "tag": [
+        {
+          "system": "http://example.com/auth",
+          "code": "/Y63UYsirfLkT"
+        }
+      ]
+    }
+  };
+}
+
+function urlExists(url) {
+  return new Promise((resolve, reject) => {
+    const req = http.get(url, (res) => {
+      if (res.statusCode === 200) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+      res.resume();
+    });
+    req.on('error', (err) => {
+      resolve(false);
+    });
+  });
+}
+
 
 const getOnePatient = async(req,res) => {
   if (req.headers['content-type'] !== 'application/fhir+json') {
@@ -47,17 +97,39 @@ const validatePatient = async(req,res) => {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
-    //set content type to fhir
-    res.setHeader('Content-Type', 'application/fhir+json');
-    //set url/token
-    let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
-    let accessToken = req.headers.authorization;
-    santeAPI.GET(accessToken,url).then(response => { 
-      res.status(200).send(response);
-      return response;
-    }).catch(error => {
-      res.status(400).send(error)
-    })
+
+  let body = req.body; 
+
+  urlExists(config.nprsMediatorConfig.apiURL).then((exists) => {
+    if (exists) {
+      nprsAPI.POST(generateNPRSResource(body)).then(response => {
+        if(response.faultCode == 201){
+          res.status(200).send({response});
+        }
+        else{
+          res.status(200).send(response);
+        }
+        
+      }).catch(error => {
+        res.status(400).send(error)
+      })
+    }
+    else {
+      res.status(400).send({
+        "message": "No response from NPRS",
+        "status": "unknown",
+        "data": {
+            "idNo":body.identifier[0].value,
+            "sex": body.gender.charAt(0),
+            "surname": body.name[0].family,
+            "auth": "/Y63UYsirfLkT"
+        }
+    });
+    }
+  })
+  .catch((err) => {
+    res.status(400).send(err)
+  });
 };
 
 const searchPatient =  async (req,res) => {
@@ -107,18 +179,87 @@ const createPatient = async (req,res) =>  {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
-    //set content type to fhir
-    res.setHeader('Content-Type', 'application/fhir+json');
+  let body = req.body; 
+  let accessToken = req.headers.authorization;
 
-    let body = req.body; 
-    let accessToken = req.headers.authorization;
-    santeAPI.POST(body,accessToken).then(response => {
-      res.status(200).send(response);
-      //return response;
-    }).catch(error => {
-      res.status(400).send(error)
-    })
-};
+  // Is the NPRS endpoint accessible?
+
+  urlExists(config.nprsMediatorConfig.apiURL).then((exists) => {
+    if (exists) {
+      var validation = "";
+
+      nprsAPI.POST(generateNPRSResource(body)).then(response => {
+        if(response.faultCode == 201){
+          validation = "valid";
+          var official_names = {
+            "name": [ {
+                "family": response.surnameActive,
+                "given": response.firstNameActive,
+                "use":"official"
+              }
+              ],
+          }
+          body.name = body.name.concat(official_names.name);
+        }
+        else if (response.status == "invalid"){
+          validation = "invalid";
+        }
+
+        var validation_obj = {
+          "extension": [
+              {
+                  "url": "urn:validationproject:nprsStatus",
+                  "valueString": validation
+              }
+        ]};
+        
+        //set content type to fhir
+        res.setHeader('Content-Type', 'application/fhir+json');
+
+        // add validation status
+        _.merge(body, validation_obj);
+
+        //create patient
+        santeAPI.POST(body,accessToken).then(response => {
+          res.status(200).send(response);
+        }).catch(error => {
+          res.status(400).send(error)
+        })
+
+      }).catch(error => {
+        res.status(400).send(error)
+      }) 
+    } else {
+      var validation_obj = {
+        "extension": [
+            {
+                "url": "urn:validationproject:nprsStatus",
+                "valueString": "unknown"
+            }
+      ]};
+
+      //set content type to fhir
+      res.setHeader('Content-Type', 'application/fhir+json');
+
+      // add validation status
+      _.merge(body, validation_obj);
+
+      //create patient
+      santeAPI.POST(body,accessToken).then(response => {
+    
+        res.status(200).send(response);
+      }).catch(error => {
+        res.status(400).send(error)
+      })
+    }
+  })
+  .catch((err) => {
+    res.status(400).send(err)
+  });
+
+
+     
+  };
 
 
 const updatePatient = async  (req,res) => {
