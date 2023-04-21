@@ -98,32 +98,41 @@ const validatePatient = async(req,res) => {
     return;
   }
 
+  //set content type to fhir
+  res.setHeader('Content-Type', 'application/fhir+json');
+
   let body = req.body; 
 
   urlExists(config.nprsMediatorConfig.apiURL).then((exists) => {
     if (exists) {
       nprsAPI.POST(generateNPRSResource(body)).then(response => {
-        if(response.faultCode == 201){
-          res.status(200).send({response});
-        }
-        else{
-          res.status(200).send(response);
-        }
-        
+        res.status(200).send(response);
       }).catch(error => {
         res.status(400).send(error)
       })
     }
     else {
       res.status(400).send({
-        "message": "No response from NPRS",
-        "status": "unknown",
-        "data": {
-            "idNo":body.identifier[0].value,
-            "sex": body.gender.charAt(0),
-            "surname": body.name[0].family,
-            "auth": "/Y63UYsirfLkT"
-        }
+      
+          "resourceType": "Patient",
+          "identifier": [
+              {
+                  "system": "http://ohie.org/National_ID",
+                  "value": body.identifier[0].value
+              }
+          ],
+          "extension": [
+              {
+                  "url": "urn:validationproject:nprsStatus",
+                  "valueString": "unknown"
+              }
+          ],
+          "name": [
+              {
+                  "family": body.name[0].family
+              }
+          ],
+          "gender": body.gender
     });
     }
   })
