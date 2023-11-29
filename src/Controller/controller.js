@@ -7,8 +7,8 @@ const { SanteAPI } = require('../sante-mediator/sante-mediator-api');
 const { NPRSAPI } = require('../nprs-mediator/nprs-mediator-api');
 const santeAPI = new SanteAPI();
 const nprsAPI = new NPRSAPI();
-
 const config = require('../config/private-config.json');
+var nprsUrl = "urn:validationproject:nprsStatus";
 
 
 function generateNPRSResource(body) {
@@ -57,7 +57,7 @@ function urlExists(url) {
 
 
 const getOnePatient = async(req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+ if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -75,7 +75,7 @@ const getOnePatient = async(req,res) => {
 };
 
 const generateQR = async(req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -93,7 +93,7 @@ const generateQR = async(req,res) => {
 };
 
 const validatePatient = async(req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -142,7 +142,7 @@ const validatePatient = async(req,res) => {
 };
 
 const searchPatient =  async (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+ if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -161,7 +161,7 @@ const searchPatient =  async (req,res) => {
 };
 
 const getSimilarPatient =  async (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -184,7 +184,7 @@ const getSimilarPatient =  async (req,res) => {
 };
 
 const createPatient = async (req,res) =>  {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -213,21 +213,13 @@ const createPatient = async (req,res) =>  {
         else if (response.status == "invalid"){
           validation = "invalid";
         }
-
-        var validation_obj = {
-          "extension": [
-              {
-                  "url": "urn:validationproject:nprsStatus",
-                  "valueString": validation
-              }
-        ]};
-        
+       
         //set content type to fhir
         res.setHeader('Content-Type', 'application/fhir+json');
 
         // add validation status
-        _.merge(body, validation_obj);
-
+        const a=mergeExtension(body, nprsUrl, validation);
+        console.log(a)
         //create patient
         santeAPI.POST(body,accessToken).then(response => {
           res.status(200).send(response);
@@ -239,19 +231,12 @@ const createPatient = async (req,res) =>  {
         res.status(400).send(error)
       }) 
     } else {
-      var validation_obj = {
-        "extension": [
-            {
-                "url": "urn:validationproject:nprsStatus",
-                "valueString": "unknown"
-            }
-      ]};
-
+     
       //set content type to fhir
       res.setHeader('Content-Type', 'application/fhir+json');
-
       // add validation status
-      _.merge(body, validation_obj);
+      const a = mergeExtension(body, nprsUrl,"unknown");
+      console.log(a)
 
       //create patient
       santeAPI.POST(body,accessToken).then(response => {
@@ -265,14 +250,30 @@ const createPatient = async (req,res) =>  {
   .catch((err) => {
     res.status(400).send(err)
   });
-
-
-     
   };
 
 
+  function mergeExtension(body, extensionUrl, extensionValue) {
+   if (!body.extension) {
+    body.extension = [];
+  }
+
+  const extensionExists = body.extension.some(ext => ext.url === extensionUrl);
+  if (!extensionExists) {
+    const newExtension = {
+      "url": extensionUrl,
+      "valueString": extensionValue
+    };
+    body.extension.push(newExtension);
+    return body; 
+  }
+
+  return body; 
+}
+
+
 const updatePatient = async  (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -295,7 +296,7 @@ const updatePatient = async  (req,res) => {
 };
 
 const mergePatient = async (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -392,7 +393,7 @@ const mergePatient = async (req,res) => {
 };
 
 const getToken = async(req,res) => {
-   if (req.headers['content-type'] !== 'application/fhir+json') {
+   if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
