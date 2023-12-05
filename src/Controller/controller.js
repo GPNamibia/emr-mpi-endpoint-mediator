@@ -9,6 +9,11 @@ const santeAPI = new SanteAPI();
 const nprsAPI = new NPRSAPI();
 const config = require('../config/private-config.json');
 var nprsUrl = "urn:validationproject:nprsStatus";
+var registrationDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-registration-date";
+var updatedDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-update-date";
+var datetime = new Date();
+var newDate = datetime.toISOString().slice(0, 10);
+
 
 
 function generateNPRSResource(body) {
@@ -217,9 +222,13 @@ const createPatient = async (req,res) =>  {
         //set content type to fhir
         res.setHeader('Content-Type', 'application/fhir+json');
 
-        // add validation status
-        const a=mergeExtension(body, nprsUrl, validation);
-        console.log(a)
+        // add extension status
+        const nprsExt=mergeExtension(body, nprsUrl, validation);
+        const registrationDateExt = mergeDateExtension(body, registrationDateUrl, newDate);
+        
+
+        console.log(registrationDateExt)
+
         //create patient
         santeAPI.POST(body,accessToken).then(response => {
           res.status(200).send(response);
@@ -235,12 +244,11 @@ const createPatient = async (req,res) =>  {
       //set content type to fhir
       res.setHeader('Content-Type', 'application/fhir+json');
       // add validation status
-      const a = mergeExtension(body, nprsUrl,"unknown");
-      console.log(a)
-
+      const nprsExt = mergeExtension(body, nprsUrl, "unknown");
+      const registrationDateExt = mergeDateExtension(body, registrationDateUrl, newDate);
       //create patient
       santeAPI.POST(body,accessToken).then(response => {
-    
+        console.log(response)
         res.status(200).send(response);
       }).catch(error => {
         res.status(400).send(error)
@@ -271,29 +279,105 @@ const createPatient = async (req,res) =>  {
   return body; 
 }
 
+ function mergeDateExtension(body, extensionUrl, extensionValue) {
+   if (!body.extension) {
+    body.extension = [];
+  }
 
-const updatePatient = async  (req,res) => {
+  const extensionExists = body.extension.some(ext => ext.url === extensionUrl);
+  if (!extensionExists) {
+    const newExtension = {
+      "url": extensionUrl,
+      "valueString": extensionValue
+    };
+    body.extension.push(newExtension);
+    return body; 
+  }
+
+  return body; 
+}
+
+// const updatePatient = async  (req,res) => {
+
+//   if (!req.headers['content-type'].startsWith('application/fhir+json')) {
+//     res.status(415).send({error: 'Unsupported Media Type'});
+//     return;
+//   }
+//     //set content type to fhir
+//     res.setHeader('Content-Type', 'application/fhir+json');
+
+//     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
+//     let accessToken = req.headers.authorization;
+//     santeAPI.GET(accessToken,url).then(response => {
+//       let body = req.body;
+//       let id = response.entry[0].resource.id; 
+//       console.log("Original",body.extension);
+//       console.log("Sante",response.entry[0].resource.extension);
+//       const updatedDateExt = mergeDateExtension(body, updatedDateUrl, newDate);
+//       santeAPI.PUT(body,accessToken,id).then(response => { 
+//         res.status(200).send(response); 
+//       }).catch(error => {
+//         res.status(400).send(error)
+//       }) 
+//     }).catch(error => {
+//       res.status(400).send(error)
+//     })  
+// };
+
+
+const updatePatient = async (req, res) => {
   if (!req.headers['content-type'].startsWith('application/fhir+json')) {
-    res.status(415).send({error: 'Unsupported Media Type'});
+    res.status(415).send({ error: 'Unsupported Media Type' });
     return;
   }
-    //set content type to fhir
-    res.setHeader('Content-Type', 'application/fhir+json');
 
-    let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
-    let accessToken = req.headers.authorization;
-    santeAPI.GET(accessToken,url).then(response => {
-      let body = req.body;
-      let id = response.entry[0].resource.id; 
-      santeAPI.PUT(body,accessToken,id).then(response => { 
-        res.status(200).send(response); 
-      }).catch(error => {
-        res.status(400).send(error)
-      }) 
-    }).catch(error => {
-      res.status(400).send(error)
-    })  
+  // set content type to fhir
+  res.setHeader('Content-Type', 'application/fhir+json');
+
+  let url = '/getResource?identifier=http://ohie.org/Health_ID|' + req.params.id;
+  let accessToken = req.headers.authorization;
+
+  try {
+    const santeResponse = await santeAPI.GET(accessToken, url);
+
+    let body = req.body;
+    let id = santeResponse.entry[0].resource.id;
+
+    console.log("Original", body.extension);
+    console.log("Sante", santeResponse.entry[0].resource.extension);
+
+    // Extract extensions from the original and Sante arrays
+    const originalExtensions = body.extension;
+    const santeExtensions = santeResponse.entry[0].resource.extension;
+
+    // Check and push only non-duplicate extensions to Sante extensions
+    originalExtensions.forEach((originalExt) => {
+      const exists = santeExtensions.some(
+        (santeExt) => santeExt.url === originalExt.url
+      );
+
+      if (!exists) {
+        santeExtensions.push(originalExt);
+      }
+    });
+
+    // Update body.extensions with Sante extensions
+    body.extension = santeExtensions;
+
+    console.log("BODY", body);
+
+    // Merge other necessary extensions
+    const updatedDateExt = mergeDateExtension(body, updatedDateUrl, newDate);
+
+    // Perform the PUT request to update the patient resource
+    const updateResponse = await santeAPI.PUT(body, accessToken, id);
+
+    res.status(200).send(updateResponse);
+  } catch (error) {
+    res.status(400).send(error);
+  }
 };
+
 
 const mergePatient = async (req,res) => {
   if (!req.headers['content-type'].startsWith('application/fhir+json')) {
