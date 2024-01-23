@@ -352,11 +352,16 @@ const updatePatient = async (req, res) => {
 
     // Check and push only non-duplicate extensions to Sante extensions
     originalExtensions.forEach((originalExt) => {
-      const exists = santeExtensions.some(
-        (santeExt) => santeExt.url === originalExt.url
-      );
+      const santeExtIndex = santeExtensions.findIndex((santeExt) => santeExt.url === originalExt.url);
 
-      if (!exists) {
+      if (santeExtIndex !== -1) {
+        // Check if values are different
+        if (santeExtensions[santeExtIndex].valueString !== originalExt.valueString) {
+          // Update the value in Sante extensions with the value from the Original extension
+          santeExtensions[santeExtIndex].valueString = originalExt.valueString;
+        }
+      } else {
+        // Extension doesn't exist in Sante extensions, so add it
         santeExtensions.push(originalExt);
       }
     });
