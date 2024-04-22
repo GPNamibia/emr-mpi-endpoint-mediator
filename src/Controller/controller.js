@@ -7,8 +7,13 @@ const { SanteAPI } = require('../sante-mediator/sante-mediator-api');
 const { NPRSAPI } = require('../nprs-mediator/nprs-mediator-api');
 const santeAPI = new SanteAPI();
 const nprsAPI = new NPRSAPI();
-
 const config = require('../config/private-config.json');
+var nprsUrl = "urn:validationproject:nprsStatus";
+var registrationDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-registration-date";
+var updatedDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-update-date";
+var datetime = new Date();
+var newDate = datetime.toISOString().slice(0, 10);
+
 
 
 function generateNPRSResource(body) {
@@ -57,7 +62,7 @@ function urlExists(url) {
 
 
 const getOnePatient = async(req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+ if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -75,7 +80,7 @@ const getOnePatient = async(req,res) => {
 };
 
 const generateQR = async(req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -93,7 +98,7 @@ const generateQR = async(req,res) => {
 };
 
 const validatePatient = async(req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -142,7 +147,7 @@ const validatePatient = async(req,res) => {
 };
 
 const searchPatient =  async (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+ if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -161,7 +166,7 @@ const searchPatient =  async (req,res) => {
 };
 
 const getSimilarPatient =  async (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -184,7 +189,7 @@ const getSimilarPatient =  async (req,res) => {
 };
 
 const createPatient = async (req,res) =>  {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -213,20 +218,16 @@ const createPatient = async (req,res) =>  {
         else if (response.status == "invalid"){
           validation = "invalid";
         }
-
-        var validation_obj = {
-          "extension": [
-              {
-                  "url": "urn:validationproject:nprsStatus",
-                  "valueString": validation
-              }
-        ]};
-        
+       
         //set content type to fhir
         res.setHeader('Content-Type', 'application/fhir+json');
 
-        // add validation status
-        _.merge(body, validation_obj);
+        // add extension status
+        const nprsExt=mergeExtension(body, nprsUrl, validation);
+        const registrationDateExt = mergeDateExtension(body, registrationDateUrl, newDate);
+        
+
+        console.log(registrationDateExt)
 
         //create patient
         santeAPI.POST(body,accessToken).then(response => {
@@ -239,23 +240,15 @@ const createPatient = async (req,res) =>  {
         res.status(400).send(error)
       }) 
     } else {
-      var validation_obj = {
-        "extension": [
-            {
-                "url": "urn:validationproject:nprsStatus",
-                "valueString": "unknown"
-            }
-      ]};
-
+     
       //set content type to fhir
       res.setHeader('Content-Type', 'application/fhir+json');
-
       // add validation status
-      _.merge(body, validation_obj);
-
+      const nprsExt = mergeExtension(body, nprsUrl, "unknown");
+      const registrationDateExt = mergeDateExtension(body, registrationDateUrl, newDate);
       //create patient
       santeAPI.POST(body,accessToken).then(response => {
-    
+        console.log(response)
         res.status(200).send(response);
       }).catch(error => {
         res.status(400).send(error)
@@ -265,37 +258,134 @@ const createPatient = async (req,res) =>  {
   .catch((err) => {
     res.status(400).send(err)
   });
-
-
-     
   };
 
 
-const updatePatient = async  (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
-    res.status(415).send({error: 'Unsupported Media Type'});
+  function mergeExtension(body, extensionUrl, extensionValue) {
+   if (!body.extension) {
+    body.extension = [];
+  }
+
+  const extensionExists = body.extension.some(ext => ext.url === extensionUrl);
+  if (!extensionExists) {
+    const newExtension = {
+      "url": extensionUrl,
+      "valueString": extensionValue
+    };
+    body.extension.push(newExtension);
+    return body; 
+  }
+
+  return body; 
+}
+
+ function mergeDateExtension(body, extensionUrl, extensionValue) {
+   if (!body.extension) {
+    body.extension = [];
+  }
+
+  const extensionExists = body.extension.some(ext => ext.url === extensionUrl);
+  if (!extensionExists) {
+    const newExtension = {
+      "url": extensionUrl,
+      "valueString": extensionValue
+    };
+    body.extension.push(newExtension);
+    return body; 
+  }
+
+  return body; 
+}
+
+// const updatePatient = async  (req,res) => {
+
+//   if (!req.headers['content-type'].startsWith('application/fhir+json')) {
+//     res.status(415).send({error: 'Unsupported Media Type'});
+//     return;
+//   }
+//     //set content type to fhir
+//     res.setHeader('Content-Type', 'application/fhir+json');
+
+//     let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
+//     let accessToken = req.headers.authorization;
+//     santeAPI.GET(accessToken,url).then(response => {
+//       let body = req.body;
+//       let id = response.entry[0].resource.id; 
+//       console.log("Original",body.extension);
+//       console.log("Sante",response.entry[0].resource.extension);
+//       const updatedDateExt = mergeDateExtension(body, updatedDateUrl, newDate);
+//       santeAPI.PUT(body,accessToken,id).then(response => { 
+//         res.status(200).send(response); 
+//       }).catch(error => {
+//         res.status(400).send(error)
+//       }) 
+//     }).catch(error => {
+//       res.status(400).send(error)
+//     })  
+// };
+
+
+const updatePatient = async (req, res) => {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
+    res.status(415).send({ error: 'Unsupported Media Type' });
     return;
   }
-    //set content type to fhir
-    res.setHeader('Content-Type', 'application/fhir+json');
 
-    let url = '/getResource?identifier=http://ohie.org/Health_ID|'+req.params.id;  
-    let accessToken = req.headers.authorization;
-    santeAPI.GET(accessToken,url).then(response => {
-      let body = req.body;
-      let id = response.entry[0].resource.id; 
-      santeAPI.PUT(body,accessToken,id).then(response => { 
-        res.status(200).send(response); 
-      }).catch(error => {
-        res.status(400).send(error)
-      }) 
-    }).catch(error => {
-      res.status(400).send(error)
-    })  
+  // set content type to fhir
+  res.setHeader('Content-Type', 'application/fhir+json');
+
+  let url = '/getResource?identifier=http://ohie.org/Health_ID|' + req.params.id;
+  let accessToken = req.headers.authorization;
+
+  try {
+    const santeResponse = await santeAPI.GET(accessToken, url);
+
+    let body = req.body;
+    let id = santeResponse.entry[0].resource.id;
+
+    console.log("Original", body.extension);
+    console.log("Sante", santeResponse.entry[0].resource.extension);
+
+    // Extract extensions from the original and Sante arrays
+    const originalExtensions = body.extension;
+    const santeExtensions = santeResponse.entry[0].resource.extension;
+
+    // Check and push only non-duplicate extensions to Sante extensions
+    originalExtensions.forEach((originalExt) => {
+      const santeExtIndex = santeExtensions.findIndex((santeExt) => santeExt.url === originalExt.url);
+
+      if (santeExtIndex !== -1) {
+        // Check if values are different
+        if (santeExtensions[santeExtIndex].valueString !== originalExt.valueString) {
+          // Update the value in Sante extensions with the value from the Original extension
+          santeExtensions[santeExtIndex].valueString = originalExt.valueString;
+        }
+      } else {
+        // Extension doesn't exist in Sante extensions, so add it
+        santeExtensions.push(originalExt);
+      }
+    });
+
+    // Update body.extensions with Sante extensions
+    body.extension = santeExtensions;
+
+    console.log("BODY", body);
+
+    // Merge other necessary extensions
+    const updatedDateExt = mergeDateExtension(body, updatedDateUrl, newDate);
+
+    // Perform the PUT request to update the patient resource
+    const updateResponse = await santeAPI.PUT(body, accessToken, id);
+
+    res.status(200).send(updateResponse);
+  } catch (error) {
+    res.status(400).send(error);
+  }
 };
 
+
 const mergePatient = async (req,res) => {
-  if (req.headers['content-type'] !== 'application/fhir+json') {
+  if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
@@ -392,7 +482,7 @@ const mergePatient = async (req,res) => {
 };
 
 const getToken = async(req,res) => {
-   if (req.headers['content-type'] !== 'application/fhir+json') {
+   if (!req.headers['content-type'].startsWith('application/fhir+json')) {
     res.status(415).send({error: 'Unsupported Media Type'});
     return;
   }
