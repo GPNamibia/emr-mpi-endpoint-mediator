@@ -12,7 +12,7 @@ var nprsUrl = "urn:validationproject:nprsStatus";
 var registrationDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-registration-date";
 var updatedDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-update-date";
 var datetime = new Date();
-var newDate = datetime.toISOString().slice(0, 10);
+var newDate = datetime.toISOString().slice(0, 16).replace('T', ' ');
 
 
 
