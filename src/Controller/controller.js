@@ -11,9 +11,6 @@ const config = require('../config/private-config.json');
 var nprsUrl = "urn:validationproject:nprsStatus";
 var registrationDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-registration-date";
 var updatedDateUrl = "http://hl7.org/fhir/StructureDefinition/patient-update-date";
-var datetime = new Date();
-var newDate = datetime.toISOString().slice(0, 10);
-
 
 
 function generateNPRSResource(body) {
@@ -224,7 +221,7 @@ const createPatient = async (req,res) =>  {
 
         // add extension status
         const nprsExt=mergeExtension(body, nprsUrl, validation);
-        const registrationDateExt = mergeDateExtension(body, registrationDateUrl, newDate);
+        const registrationDateExt = mergeDateExtension(body, registrationDateUrl, getCurrentDateTime());
         
 
         console.log(registrationDateExt)
@@ -245,7 +242,7 @@ const createPatient = async (req,res) =>  {
       res.setHeader('Content-Type', 'application/fhir+json');
       // add validation status
       const nprsExt = mergeExtension(body, nprsUrl, "unknown");
-      const registrationDateExt = mergeDateExtension(body, registrationDateUrl, newDate);
+      const registrationDateExt = mergeDateExtension(body, registrationDateUrl, getCurrentDateTime());
       //create patient
       santeAPI.POST(body,accessToken).then(response => {
         console.log(response)
@@ -372,7 +369,7 @@ const updatePatient = async (req, res) => {
     console.log("BODY", body);
 
     // Merge other necessary extensions
-    const updatedDateExt = mergeDateExtension(body, updatedDateUrl, newDate);
+    const updatedDateExt = mergeDateExtension(body, updatedDateUrl, getCurrentDateTime());
 
     // Perform the PUT request to update the patient resource
     const updateResponse = await santeAPI.PUT(body, accessToken, id);
@@ -382,6 +379,11 @@ const updatePatient = async (req, res) => {
     res.status(400).send(error);
   }
 };
+
+function getCurrentDateTime() {
+  const datetime = new Date();
+  return datetime.toISOString().slice(0, 16).replace('T', ' ');
+}
 
 
 const mergePatient = async (req,res) => {
