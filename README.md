@@ -69,7 +69,7 @@ To run the mediator without connecting it to the OpenHIM server, you can use the
 
   
 
-1. Clone or download the repository.`git clone https://github.com/UCSF-GP-Namibia/emr-mpi-endpoint-mediator.git`
+1. Clone or download the repository.`git clone https://github.com/GP-Namibia/emr-mpi-endpoint-mediator.git`
 
   
 
@@ -105,7 +105,7 @@ The mediator can be built and run using the `docker-compose.yml` file configurat
 
   
 
-1. Clone or download the repository.`git clone https://github.com/UCSF-GP-Namibia/emr-mpi-endpoint-mediator.git`
+1. Clone or download the repository.`git clone https://github.com/GP-Namibia/emr-mpi-endpoint-mediator.git`
 
   
 
