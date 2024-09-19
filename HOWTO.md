@@ -505,7 +505,7 @@ PUT localhost:7000/patient/12WENR6
 
   
 
-URL: `localhost:7000/Patient/12WENR6`
+URL: `localhost:7000/Patient`
 
 Method: `GET`
 
